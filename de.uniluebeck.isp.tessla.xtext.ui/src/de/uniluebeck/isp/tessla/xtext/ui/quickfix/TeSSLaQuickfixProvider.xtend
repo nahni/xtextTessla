@@ -4,6 +4,18 @@
 package de.uniluebeck.isp.tessla.xtext.ui.quickfix
 
 import org.eclipse.xtext.ui.editor.quickfix.DefaultQuickfixProvider
+import org.eclipse.xtext.ui.editor.quickfix.Fix
+import de.uniluebeck.isp.tessla.xtext.validation.TeSSLaValidator
+import org.eclipse.xtext.validation.Issue
+import org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor
+import org.eclipse.xtext.ui.editor.model.edit.ISemanticModification
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.ui.editor.model.edit.IModificationContext
+import de.uniluebeck.isp.tessla.xtext.teSSLa.Model
+import de.uniluebeck.isp.tessla.xtext.teSSLa.TeSSLaFactory
+import de.uniluebeck.isp.tessla.xtext.teSSLa.Statement
+import de.uniluebeck.isp.tessla.xtext.teSSLa.definition
+import de.uniluebeck.isp.tessla.xtext.teSSLa.value
 
 /**
  * Custom quickfixes.
@@ -12,13 +24,42 @@ import org.eclipse.xtext.ui.editor.quickfix.DefaultQuickfixProvider
  */
 class TeSSLaQuickfixProvider extends DefaultQuickfixProvider {
 
-//	@Fix(TeSSLaValidator.INVALID_NAME)
-//	def capitalizeName(Issue issue, IssueResolutionAcceptor acceptor) {
-//		acceptor.accept(issue, 'Capitalize name', 'Capitalize the name.', 'upcase.png') [
-//			context |
-//			val xtextDocument = context.xtextDocument
-//			val firstLetter = xtextDocument.get(issue.offset, 1)
-//			xtextDocument.replace(issue.offset, 1, firstLetter.toUpperCase)
-//		]
+	@Fix(TeSSLaValidator.NOT_DEFINED)
+	def capitalizeName(Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, 'Capitalize name', 'Capitalize the name.', 'upcase.png') [
+			context |
+			val xtextDocument = context.xtextDocument
+			val firstLetter = xtextDocument.get(issue.offset, 1)
+			xtextDocument.replace(issue.offset, 1, firstLetter.toUpperCase)
+		]
+	}
+
+//	@Fix(TeSSLaValidator.NOT_DEFINED)
+//	def addDefinition(Issue issue, IssueResolutionAcceptor acceptor){
+//		acceptor.accept(issue, 'Add definition', 
+//			'Adds a new definition of the not defined value', 
+//			null, 
+//			new ISemanticModification() {
+//				override apply(EObject element, IModificationContext context) throws Exception {
+//					val String notDefinedVar = (element as value).name
+//					var EObject parent = element.eContainer
+//					var Model model = null
+//					
+//					do{
+//						try{
+//							model = parent as Model
+//						} catch(Exception e){}
+//					} while(parent !== null)
+//					
+//					var definition def = TeSSLaFactory.eINSTANCE.createdefinition
+//					def.setName(notDefinedVar)
+//					var Statement defStatement = TeSSLaFactory.eINSTANCE.createStatement
+//					defStatement.setDef(def)
+//					
+//					model.spec.add(defStatement)
+//					println('QuickFix')
+//				}	
+//			})
 //	}
+	
 }

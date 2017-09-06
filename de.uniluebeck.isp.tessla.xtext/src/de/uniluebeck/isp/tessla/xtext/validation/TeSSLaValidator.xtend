@@ -3,6 +3,12 @@
  */
 package de.uniluebeck.isp.tessla.xtext.validation
 
+import de.uniluebeck.isp.tessla.xtext.teSSLa.Model
+import org.eclipse.emf.ecore.EObject
+import de.uniluebeck.isp.tessla.xtext.teSSLa.value
+import de.uniluebeck.isp.tessla.xtext.teSSLa.definition
+import org.eclipse.xtext.validation.Check
+import de.uniluebeck.isp.tessla.xtext.teSSLa.TeSSLaPackage
 
 /**
  * This class contains custom validation rules. 
@@ -21,5 +27,74 @@ class TeSSLaValidator extends AbstractTeSSLaValidator {
 //					INVALID_NAME)
 //		}
 //	}
+
+	public static val NOT_DEFINED = 'notDefined'
+
+	@Check
+	def checkDeclarations(value value){
+		if(value.name !== null){
+			if(value.name != 'default' && value.name != 'last' && value.name != 'function_call' && value.name != 'time' && value.name != 'defaultFrom'){
+				var EObject parent = value.eContainer
+				var Model model = null
+				var definition innerDef = null
+				var value valueWithStatements = null
+				
+				var boolean defined = false 
+				
+				do{
+					try{
+						model = parent as Model
+					} catch(ClassCastException e){
+						try{
+							innerDef = parent as definition
+							if(innerDef.name.equals(value.name)) defined = true
+							if(innerDef.eIsSet(TeSSLaPackage.Literals.DEFINITION__PARAM_LIST)){
+								for(param : innerDef.paramList.params){
+									if(param.equals(value.name)) defined = true
+								}
+							}
+						} catch(ClassCastException e2){
+							try{
+								valueWithStatements = parent as value
+								if(valueWithStatements.eIsSet(TeSSLaPackage.Literals.VALUE__STATEMENTS)){
+									for(statement : valueWithStatements.statements){
+										if(statement.def !== null){
+											if(value.name == statement.def.name){
+												defined = true
+											}
+										}
+										else if(statement.in !== null){
+											if(value.name == statement.in.name){
+												defined = true
+											}
+										}
+									}
+								}
+							} catch (Exception e3){}
+						}
+					}
+					parent = parent.eContainer 
+				} while(parent !== null)
+				
+				
+				
+				for(statement : model.spec){
+					if(statement.def !== null){
+						if(value.name == statement.def.name){
+							defined = true
+						}
+					} else if(statement.in !== null){
+						if(value.name == statement.in.name){
+							defined = true
+						}
+					}
+				}
+				
+				if(!defined){
+					error(value.name + ' is not defined', TeSSLaPackage.Literals.VALUE__NAME)
+				}	
+			}
+		}
+	}
 	
 }

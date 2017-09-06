@@ -26,7 +26,6 @@ paramList:
 
 out:
 	'out' exp=typedExpression ('as' name=ID)?
-//	'out' def=[definition]
 ;
 	
 in:
