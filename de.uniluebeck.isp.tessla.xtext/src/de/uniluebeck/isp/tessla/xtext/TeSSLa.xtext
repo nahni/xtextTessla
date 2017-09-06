@@ -1,0 +1,94 @@
+grammar de.uniluebeck.isp.tessla.xtext.TeSSLa with org.eclipse.xtext.common.Terminals
+
+generate teSSLa "http://www.uniluebeck.de/isp/tessla/xtext/TeSSLa"
+
+Model:
+	spec += Statement*;
+	
+Statement:
+	{Statement} (def=definition | out=out | in=in | comment=SL_COMMENT)
+;
+  
+@Override 
+terminal SL_COMMENT:
+    ('--') !('\n'|'\r')* ('\r'? '\n')?
+;  
+  
+definition:
+	('def' | 'define') name=ID paramList=paramList? (':' type=type)? ':=' expression=typedExpression
+;
+
+paramList:
+	{paramList} (
+	'(' params+=ID (':' types+=type)? (',' params+=ID (':' types+=type)?)* ')'
+	| '(' ')'
+);
+
+out:
+	'out' exp=typedExpression ('as' name=ID)?
+//	'out' def=[definition]
+;
+	
+in:
+	'in' name=ID ':' type=type
+;
+
+typedExpression:
+	exp=expression (':' type=type)?
+;
+
+expression:
+	{IfStatement} 'if' if=typedExpression 'then' then=typedExpression ('else' else=typedExpression)?
+	| value ({Operation.left=current} op=infixOperator right=value)*
+;
+
+value:
+	{value}
+	(op=unaryOperator exp=typedExpression
+	| '(' exp=typedExpression ')'
+	| '{' statements+=Statement* exp=typedExpression '}'
+	| name=ID '(' (args+=arg (',' args+=arg)*)? ')'
+	| name=ID
+	| STRING
+	| INT
+	| '()' 
+	| 'true' 
+	| 'false')
+;
+	
+arg:
+	arg=ID '=' exp=typedExpression
+	| exp=typedExpression
+;
+
+type:
+	(ID '<' type (',' type)* '>')
+	| ID
+;
+
+infixOperator:
+	'%'
+	| '<<'
+	| '>>'
+	| '>='
+	| '<='
+	| '<'
+	| '>'
+	| '!='
+	| '=='
+	| '&'
+	| '|'
+	| '^'
+	| '+'
+	| '-'
+	| '*'
+	| '/'
+	| '&&'
+	| '||'
+;
+
+unaryOperator:
+	'~'
+	| '-'
+	| '!'
+;

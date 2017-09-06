@@ -1,0 +1,9 @@
+grammar de.uniluebeck.isp.tessla.xtext.TeSSLa with org.eclipse.xtext.common.Terminals
+
+generate teSSLa "http://www.uniluebeck.de/isp/tessla/xtext/TeSSLa"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';
